@@ -208,18 +208,24 @@ async function tryTelegramInitAuth() {
   if (tgLoginWrap) tgLoginWrap.classList.add("hidden");
   if (loginStatus) loginStatus.textContent = "Вход через Telegram...";
   try {
-    const res = await apiPost("/api/auth/telegram/init", {
+    const res = await apiPostRaw("/api/auth/telegram/init", {
       init_data: tg.initData,
     });
-    if (res.ok && res.token) {
-      setAuthToken(res.token, res.user);
+    if (res.ok && res.data && res.data.ok && res.data.token) {
+      setAuthToken(res.data.token, res.data.user);
       await refreshCore();
     } else if (loginStatus) {
-      loginStatus.textContent =
-        res.message || "Ошибка авторизации через Telegram.";
+      const msg =
+        (res.data && res.data.message) ||
+        `Ошибка авторизации через Telegram. (${res.status})`;
+      loginStatus.textContent = msg;
     }
   } catch (err) {
-    if (loginStatus) loginStatus.textContent = "Ошибка авторизации через Telegram.";
+    if (loginStatus) {
+      loginStatus.textContent = `Ошибка авторизации через Telegram: ${
+        err?.message || "неизвестная ошибка"
+      }`;
+    }
   }
 }
 
@@ -668,6 +674,24 @@ async function apiPost(url, body) {
     throw new Error(text || "API error");
   }
   return res.json();
+}
+
+async function apiPostRaw(url, body) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  let data = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      data = null;
+    }
+  }
+  return { ok: res.ok, status: res.status, text, data };
 }
 
 if (loginForm) {
