@@ -393,6 +393,7 @@ header.card h1::after {
   font-size: 13px;
   line-height: 1.4;
   font-family: "Courier New", monospace;
+  white-space: pre-line;
   background: rgba(6, 12, 16, 0.9);
   border: 1px solid rgba(39, 199, 165, 0.35);
   padding: 14px 16px;

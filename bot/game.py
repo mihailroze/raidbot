@@ -163,24 +163,32 @@ def consume_medkit(session: Dict[str, Any], data: GameData) -> Tuple[Dict[str, A
 def resolve_fight(session: Dict[str, Any], enemy: Dict[str, Any]) -> Tuple[Dict[str, Any], str, bool]:
     log = []
     enemy_hp = int(enemy.get("hp_current", enemy.get("hp", 0)))
-    enemy_name = enemy.get("name", "ARC-бот")
+    enemy_name = enemy.get("name", "ARC-???")
 
     rounds = 0
     while session["hp"] > 0 and enemy_hp > 0 and rounds < 10:
         rounds += 1
+        log.append(f"Раунд {rounds}/10:")
         player_damage = (
             random.randint(10, 18)
             + session["weapon_bonus"]
             + int(session.get("damage_bonus", 0))
         )
+        before_enemy = enemy_hp
         enemy_hp -= player_damage
-        log.append(f"Вы нанесли {player_damage} урона.")
+        log.append(
+            f"  🗡️ Вы наносите {player_damage} урона. HP врага: {before_enemy}→{max(0, enemy_hp)}."
+        )
         if enemy_hp <= 0:
             break
         enemy_damage = random.randint(enemy["dmg_min"], enemy["dmg_max"])
         reduced = max(1, int(enemy_damage * (1 - session["armor_pct"])))
+        before_hp = session["hp"]
         session["hp"] -= reduced
-        log.append(f"{enemy_name} наносит {reduced} урона.")
+        log.append(
+            f"  🤖 {enemy_name} наносит {reduced} урона"
+            f" (сырой {enemy_damage}). HP: {before_hp}→{max(0, session['hp'])}."
+        )
 
     enemy["hp_current"] = max(0, enemy_hp)
     session["enemy"] = enemy if enemy_hp > 0 else None
@@ -189,15 +197,15 @@ def resolve_fight(session: Dict[str, Any], enemy: Dict[str, Any]) -> Tuple[Dict[
     if survived and enemy_hp <= 0:
         session["kills"] += 1
         session["status"] = "explore"
-        log.append(f"Враг уничтожен: {enemy_name}.")
-        return session, " ".join(log), True
+        log.append(f"✅ Враг уничтожен: {enemy_name}.")
+        return session, "\n".join(log), True
 
     if not survived:
-        log.append("Вы погибли в бою.")
+        log.append("💀 Вы погибли в бою.")
     else:
         session["status"] = "combat"
-        log.append(f"Бой продолжается. HP врага: {enemy_hp}.")
-    return session, " ".join(log), False
+        log.append(f"⚠️ Бой продолжается. HP врага: {enemy_hp}.")
+    return session, "\n".join(log), False
 
 
 def roll_bonus_drop(data: GameData, chance: float = 0.4) -> Optional[Dict[str, Any]]:
