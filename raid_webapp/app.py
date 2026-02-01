@@ -2235,23 +2235,23 @@ async def auth_telegram(payload: AuthTelegramRequest) -> Dict[str, Any]:
 @app.post("/api/auth/telegram/init")
 async def auth_telegram_init(payload: InitDataRequest) -> Dict[str, Any]:
     if not BOT_TOKEN:
-        return {"ok": False, "message": "BOT_TOKEN ?? ?????."}
-    pairs = _validate_init_data(payload.init_data)
+        return {"ok": False, "message": "BOT_TOKEN not set."}
+    pairs, reason = _validate_init_data_debug(payload.init_data)
     if not pairs:
-        return {"ok": False, "message": f"???????????? ?????? Telegram initData: {reason}"}
+        return {"ok": False, "message": f"Telegram initData invalid: {reason}"}
     tg_user = _parse_user(pairs)
     if not tg_user:
-        return {"ok": False, "message": "???????????? Telegram ?? ??????."}
+        return {"ok": False, "message": "Telegram user not found."}
     player_id = await db.upsert_player(tg_user)
     token = _create_token(player_id)
     display_name = (
         tg_user.username
         or " ".join(p for p in (tg_user.first_name, tg_user.last_name) if p)
-        or "?????"
+        or "Player"
     )
     return {
         "ok": True,
-        "message": "???? ????? Telegram ????????.",
+        "message": "Telegram login ok.",
         "token": token,
         "user": {"nickname": display_name},
     }
