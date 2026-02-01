@@ -1,0 +1,381 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Raiders Web App</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <main class="layout">
+      <header class="card">
+        <div>
+          <div class="eyebrow">ARC‑ТЕРМИНАЛ</div>
+          <h1>Raiders Bay</h1>
+          <p id="userLine">Откройте приложение через Telegram.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn auth-btn" id="loginBtn">Войти</button>
+          <button class="btn auth-btn" id="logoutBtn">Выйти</button>
+        </div>
+        <div class="badge">WEB</div>
+      </header>
+
+      <section class="card" id="loginCard">
+        <h2>Вход</h2>
+        <div id="loginStatus" class="muted">Авторизация не выполнена.</div>
+        <form id="loginForm" class="form">
+          <label>
+            Почта
+            <input type="email" id="loginEmail" placeholder="email@example.com" />
+          </label>
+          <label>
+            Пароль
+            <input type="password" id="loginPassword" placeholder="******" />
+          </label>
+          <button class="btn auth-btn" type="submit">Войти</button>
+        </form>
+        <div class="divider">Регистрация</div>
+        <form id="registerForm" class="form">
+          <label>
+            Почта
+            <input type="email" id="registerEmail" placeholder="email@example.com" />
+          </label>
+          <label>
+            Никнейм
+            <input type="text" id="registerNickname" placeholder="Ник" />
+          </label>
+          <label>
+            Пароль
+            <input type="password" id="registerPassword" placeholder="******" />
+          </label>
+          <button class="btn auth-btn" type="submit">Создать аккаунт</button>
+        </form>
+        <div class="divider">Telegram</div>
+        <div id="tgLoginWrap" class="tg-login">
+          {% if bot_username %}
+          <script
+            async
+            src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="{{ bot_username }}"
+            data-size="large"
+            data-userpic="false"
+            data-request-access="write"
+            data-onauth="onTelegramAuth(user)"
+          ></script>
+          {% else %}
+          <div class="muted">WEBAPP_BOT_USERNAME не задан.</div>
+          {% endif %}
+        </div>
+      </section>
+
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-tab="raid">Рейд</button>
+        <button class="tab" data-tab="quests">Контракты</button>
+        <button class="tab" data-tab="storage">Склад</button>
+        <button class="tab" data-tab="market">Рынок</button>
+        <button class="tab" data-tab="shop">Магазин</button>
+        <button class="tab" data-tab="craft">Крафт</button>
+        <button class="tab" data-tab="loadout">Снаряжение</button>
+        <button class="tab" data-tab="warehouse">Общий склад</button>
+        <button class="tab" data-tab="rating">Рейтинг</button>
+        <button class="tab" data-tab="season">Сезон</button>
+        <button class="tab" data-tab="case">Кейс дня</button>
+        <button class="tab" data-tab="lore">Лор</button>
+        <button class="tab admin-tab hidden" data-tab="admin">Админ</button>
+      </nav>
+
+      <section class="card" data-view="raid">
+        <h2>Статы</h2>
+        <div class="stats" id="statsBlock">—</div>
+      </section>
+
+      <section class="card" data-view="raid">
+        <h2>Событие недели</h2>
+        <div id="eventBlock">—</div>
+      </section>
+
+      <section class="card" data-view="raid">
+        <h2>Текущий рейд</h2>
+        <div id="sessionBlock">—</div>
+      </section>
+
+      <section class="card" data-view="raid">
+        <h2>Действия</h2>
+        <div id="actionsBlock" class="actions">—</div>
+        <div id="logBlock" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="quests">
+        <h2>Ежедневные контракты</h2>
+        <div id="dailyQuestList" class="list"></div>
+      </section>
+
+      <section class="card" data-view="quests">
+        <h2>Недельные контракты</h2>
+        <div id="weeklyQuestList" class="list"></div>
+        <div id="questNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="storage">
+        <h2>Хранилище</h2>
+        <div id="storageMeta" class="muted">—</div>
+        <div class="toolbar">
+          <span class="muted">Сортировка:</span>
+          <button class="chip" data-sort="rarity">Редкость</button>
+          <button class="chip" data-sort="value">Ценность</button>
+          <button class="chip" data-sort="name">Имя</button>
+          <button class="chip" data-sort="qty">Кол-во</button>
+          <input type="text" id="storageSearch" placeholder="Поиск..." />
+        </div>
+        <div id="storageList" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="storagePrev">Назад</button>
+          <div id="storagePage" class="muted">—</div>
+          <button class="btn" id="storageNext">Вперёд</button>
+        </div>
+        <div class="actions">
+          <button class="btn" id="storageUpgrade">Улучшить склад</button>
+        </div>
+        <div id="storageNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="storage">
+        <h2>Продажа</h2>
+        <div id="sellMeta" class="muted">—</div>
+        <div id="sellList" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="sellPrev">Назад</button>
+          <div id="sellPage" class="muted">—</div>
+          <button class="btn" id="sellNext">Вперёд</button>
+        </div>
+        <div id="sellSelected" class="muted">Выберите предмет для продажи.</div>
+        <div class="actions">
+          <button class="btn" data-sell="1">Продать x1</button>
+          <button class="btn" data-sell="5">Продать x5</button>
+          <button class="btn" data-sell="all">Продать всё</button>
+        </div>
+        <div id="sellNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="market">
+        <h2>Выставить на рынок</h2>
+        <div id="marketMeta" class="muted">—</div>
+        <div id="marketItems" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="marketItemsPrev">Назад</button>
+          <div id="marketItemsPage" class="muted">—</div>
+          <button class="btn" id="marketItemsNext">Вперёд</button>
+        </div>
+        <div id="marketSelected" class="muted">Выберите предмет для лота.</div>
+        <div class="form-inline">
+          <label>
+            Цена (RC)
+            <input type="number" id="marketPrice" min="1" value="50" />
+          </label>
+        </div>
+        <div class="actions">
+          <button class="btn" data-market-qty="1">Лот x1</button>
+          <button class="btn" data-market-qty="5">Лот x5</button>
+          <button class="btn" data-market-qty="all">Лот всё</button>
+        </div>
+        <div id="marketNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="market">
+        <h2>Торговая лента</h2>
+        <div id="marketListings" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="marketPrev">Назад</button>
+          <div id="marketPage" class="muted">—</div>
+          <button class="btn" id="marketNext">Вперёд</button>
+        </div>
+      </section>
+
+      <section class="card" data-view="shop">
+        <h2>Магазин</h2>
+        <div id="shopMeta" class="stats">—</div>
+        <div class="divider">Базовые товары</div>
+        <div id="shopStatic" class="list"></div>
+        <div class="divider">Витрина дня</div>
+        <div id="shopOffers" class="list"></div>
+        <div id="shopRecipe" class="list"></div>
+        <div class="divider">Улучшения</div>
+        <div id="shopUpgrade" class="list"></div>
+        <div id="shopNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="craft">
+        <h2>Крафт</h2>
+        <div id="craftList" class="list"></div>
+        <div id="craftNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="craft">
+        <h2>Чертежи</h2>
+        <div id="blueprintList" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="blueprintPrev">Назад</button>
+          <div id="blueprintPage" class="muted">—</div>
+          <button class="btn" id="blueprintNext">Вперёд</button>
+        </div>
+        <div id="blueprintNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="loadout">
+        <h2>Снаряжение</h2>
+        <div id="loadoutCurrent" class="stats">—</div>
+        <div class="actions">
+          <button class="btn" data-equip="armor">Броня</button>
+          <button class="btn" data-equip="weapon">Оружие</button>
+          <button class="btn" data-equip="medkit">Расходник</button>
+          <button class="btn" data-equip="chip">Аугмент</button>
+          <button class="btn" data-equip="clear">Снять</button>
+        </div>
+        <div id="loadoutOptions" class="list"></div>
+        <div class="pager">
+          <button class="btn" id="loadoutPrev">Назад</button>
+          <div id="loadoutPage" class="muted">—</div>
+          <button class="btn" id="loadoutNext">Вперёд</button>
+        </div>
+        <div id="loadoutNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="warehouse">
+        <h2>Общий склад</h2>
+        <div id="warehouseMeta" class="stats">—</div>
+        <div class="divider">Заказ дня</div>
+        <div id="warehouseOrder" class="list"></div>
+        <div class="divider">Топ предметов</div>
+        <div id="warehouseTop" class="list"></div>
+      </section>
+
+      <section class="card" data-view="rating">
+        <h2>Рейтинг</h2>
+        <div id="ratingList" class="list"></div>
+      </section>
+
+      <section class="card" data-view="season">
+        <h2>Сезон</h2>
+        <div id="seasonMeta" class="muted">—</div>
+        <div id="seasonList" class="list"></div>
+      </section>
+
+      <section class="card" data-view="case">
+        <h2>Ежедневный кейс</h2>
+        <div id="caseMeta" class="muted">—</div>
+        <div class="actions">
+          <button class="btn" id="caseOpen">Открыть кейс</button>
+        </div>
+        <div id="caseList" class="list"></div>
+        <div id="caseNotice" class="log muted"></div>
+      </section>
+
+      <section class="card" data-view="lore">
+        <h2>Лор и правила</h2>
+        <div class="list lore-block">
+          <div class="list-item">
+            <div class="item-main">
+              <div>ARC‑рейдеры охотятся за технологиями в зонах помех.</div>
+              <div class="muted">Чем глубже — тем ценнее, но выше риск.</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="item-main">
+              <div>Алчность влияет на события и эвакуацию.</div>
+              <div class="muted">Переоцени риск — потеряешь всё.</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="item-main">
+              <div>Квесты и сезоны дают бонусы и мотивацию.</div>
+              <div class="muted">Рейтинги обновляются по сезонам.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card admin-view hidden" data-view="admin">
+        <h2>Админ‑панель</h2>
+        <div id="adminForm" class="form">
+          <label>
+            Базовый риск
+            <input type="number" step="0.01" id="adminEventBase" />
+          </label>
+          <label>
+            Множитель алчности
+            <input type="number" step="0.0001" id="adminGreedMult" />
+          </label>
+          <label>
+            Базовая эвакуация
+            <input type="number" step="0.01" id="adminEvacBase" />
+          </label>
+          <label>
+            Падение эвакуации
+            <input type="number" step="0.0001" id="adminEvacPenalty" />
+          </label>
+          <label>
+            Цель склада
+            <input type="number" id="adminWarehouseGoal" />
+          </label>
+          <label>
+            Цель события недели
+            <input type="number" id="adminEventGoal" />
+          </label>
+          <label>
+            Лимит RC с продаж
+            <input type="number" id="adminSellCap" />
+          </label>
+          <label>
+            Лимит продаж
+            <input type="number" id="adminSellCountCap" />
+          </label>
+          <label>
+            Лимит лотов рынка
+            <input type="number" id="adminMarketCap" />
+          </label>
+          <label>
+            Сезон награда #1 (RC)
+            <input type="number" id="adminSeason1" />
+          </label>
+          <label>
+            Сезон награда #2 (RC)
+            <input type="number" id="adminSeason2" />
+          </label>
+          <label>
+            Сезон награда #3 (RC)
+            <input type="number" id="adminSeason3" />
+          </label>
+          <button class="btn" id="adminSave">Сохранить</button>
+        </div>
+        <div id="adminNotice" class="log muted"></div>
+      </section>
+
+      <section class="card muted" data-view="raid">
+        <h3>Это отдельный проект</h3>
+        <p>
+          Веб‑приложение использует ту же базу данных, что и бот. Для доступа нужен
+          Telegram WebApp и HTTPS‑ссылка.
+        </p>
+      </section>
+    </main>
+
+    <div id="onboardingModal" class="modal hidden">
+      <div class="modal-card">
+        <h2>Добро пожаловать</h2>
+        <div id="onboardingSteps" class="list"></div>
+        <button class="btn" id="onboardingDone">Понял</button>
+      </div>
+    </div>
+
+    <script>
+      window.WEBAPP_DEFAULT_CHAT_ID = {{ default_chat_id|tojson }};
+      window.WEBAPP_DEFAULT_THREAD_ID = {{ default_thread_id|tojson }};
+    </script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

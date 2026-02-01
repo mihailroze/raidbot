@@ -1,0 +1,16 @@
+[
+  {"id": "ambush", "name": "Засада", "kind": "ambush", "weight": 30},
+  {"id": "storm_minor", "name": "Слабый электрошквал", "kind": "storm", "weight": 10, "dmg_min": 6, "dmg_max": 14},
+  {"id": "storm_major", "name": "Грозовой электрошквал", "kind": "storm", "weight": 6, "dmg_min": 14, "dmg_max": 28},
+  {"id": "cache_small", "name": "Тайник (малый)", "kind": "cache", "weight": 10, "loot_rolls": 1},
+  {"id": "cache", "name": "Тайник", "kind": "cache", "weight": 12, "loot_rolls": 2},
+  {"id": "cache_big", "name": "Тайник (крупный)", "kind": "cache", "weight": 6, "loot_rolls": 3},
+  {"id": "evac_window_small", "name": "Окно эвакуации", "kind": "evac_window", "weight": 8, "bonus": 0.10},
+  {"id": "evac_window", "name": "Окно эвакуации (усил.)", "kind": "evac_window", "weight": 8, "bonus": 0.15},
+  {"id": "evac_window_large", "name": "Окно эвакуации (макс.)", "kind": "evac_window", "weight": 4, "bonus": 0.22},
+  {"id": "anomaly", "name": "Аномалия", "kind": "anomaly", "weight": 10, "heal_min": 8, "heal_max": 18, "dmg_min": 8, "dmg_max": 20, "greed_down_min": 8, "greed_down_max": 18, "greed_up_min": 6, "greed_up_max": 16},
+  {"id": "anomaly_soft", "name": "Аномалия (мягкая)", "kind": "anomaly", "weight": 6, "heal_min": 10, "heal_max": 22, "dmg_min": 6, "dmg_max": 14, "greed_down_min": 10, "greed_down_max": 22, "greed_up_min": 4, "greed_up_max": 10},
+  {"id": "quiet_zone", "name": "Тихая зона", "kind": "quiet_zone", "weight": 8, "greed_reduce_min": 12, "greed_reduce_max": 26},
+  {"id": "collector_boss", "name": "ARC-коллектор", "kind": "boss", "weight": 3, "enemy_id": "arc_collector"},
+  {"id": "reaper_boss", "name": "ARC-жнец", "kind": "boss", "weight": 2, "enemy_id": "arc_reaper"}
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "arc_drone",
+    "name": "ARC-дрон",
+    "hp": 25,
+    "dmg_min": 4,
+    "dmg_max": 10,
+    "weight": 36
+  },
+  {
+    "id": "arc_sentry",
+    "name": "ARC-часовой",
+    "hp": 35,
+    "dmg_min": 8,
+    "dmg_max": 14,
+    "weight": 24
+  },
+  {
+    "id": "arc_hunter",
+    "name": "ARC-охотник",
+    "hp": 45,
+    "dmg_min": 10,
+    "dmg_max": 16,
+    "weight": 17
+  },
+  {
+    "id": "arc_guard",
+    "name": "ARC-страж",
+    "hp": 55,
+    "dmg_min": 12,
+    "dmg_max": 20,
+    "weight": 12
+  },
+  {
+    "id": "arc_reaper",
+    "name": "ARC-жнец",
+    "hp": 75,
+    "dmg_min": 16,
+    "dmg_max": 26,
+    "weight": 6
+  },
+  {
+    "id": "arc_titan",
+    "name": "ARC-титан",
+    "hp": 95,
+    "dmg_min": 20,
+    "dmg_max": 32,
+    "weight": 4
+  },
+  {
+    "id": "arc_controller",
+    "name": "ARC-контролёр",
+    "hp": 80,
+    "dmg_min": 18,
+    "dmg_max": 30,
+    "weight": 2,
+    "legendary_bonus": 0.35,
+    "controller": true
+  },
+  {
+    "id": "arc_collector",
+    "name": "ARC-коллектор",
+    "hp": 140,
+    "dmg_min": 22,
+    "dmg_max": 36,
+    "weight": 1
+  }
+]

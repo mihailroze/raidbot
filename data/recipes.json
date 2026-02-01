@@ -1,0 +1,275 @@
+[
+  {
+    "id": "recipe_medkit",
+    "name": "Бинт",
+    "output": {
+      "item_id": "bandage",
+      "qty": 1
+    },
+    "ingredients": {
+      "tattered_clothes": 2,
+      "chemicals": 1
+    }
+  },
+  {
+    "id": "recipe_herbal_bandage",
+    "name": "Травяной бинт",
+    "output": {
+      "item_id": "herbal_bandage",
+      "qty": 1
+    },
+    "ingredients": {
+      "tattered_clothes": 2,
+      "agave": 1,
+      "chemicals": 1
+    }
+  },
+  {
+    "id": "recipe_sterilized_bandage",
+    "name": "Стерильный бинт",
+    "output": {
+      "item_id": "sterilized_bandage",
+      "qty": 1
+    },
+    "ingredients": {
+      "durable_cloth": 1,
+      "antiseptic": 1,
+      "chemicals": 2
+    }
+  },
+  {
+    "id": "recipe_vita_spray",
+    "name": "Вита-спрей",
+    "output": {
+      "item_id": "vita_spray",
+      "qty": 1
+    },
+    "ingredients": {
+      "chemicals": 4,
+      "plastic_parts": 2,
+      "battery": 1,
+      "antiseptic": 1
+    }
+  },
+  {
+    "id": "recipe_vita_shot",
+    "name": "Витаминная сыворотка",
+    "output": {
+      "item_id": "vita_shot",
+      "qty": 1
+    },
+    "ingredients": {
+      "chemicals": 5,
+      "plastic_parts": 3,
+      "battery": 1,
+      "arc_circuitry": 1
+    }
+  },
+  {
+    "id": "recipe_evac_beacon",
+    "name": "Устройство дистанционного пуска рейдерской ракеты",
+    "output": {
+      "item_id": "remote_raider_flare",
+      "qty": 1
+    },
+    "ingredients": {
+      "battery": 1,
+      "wires": 2,
+      "metal_parts": 2
+    }
+  },
+  {
+    "id": "recipe_smoke_grenade",
+    "name": "Маленькая дымовая граната",
+    "output": {
+      "item_id": "lil_smoke_grenade",
+      "qty": 1
+    },
+    "ingredients": {
+      "chemicals": 2,
+      "metal_parts": 2,
+      "wires": 1
+    }
+  },
+  {
+    "id": "recipe_armor",
+    "name": "Легкий щит",
+    "output": {
+      "item_id": "light_shield",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 5,
+      "plastic_parts": 3,
+      "arc_powercell": 1
+    }
+  },
+  {
+    "id": "recipe_tactical_armor",
+    "name": "Средний щит",
+    "output": {
+      "item_id": "medium_shield",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 7,
+      "plastic_parts": 4,
+      "arc_powercell": 2,
+      "arc_alloy": 1
+    }
+  },
+  {
+    "id": "recipe_heavy_shield",
+    "name": "Тяжелый щит",
+    "output": {
+      "item_id": "heavy_shield",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 10,
+      "plastic_parts": 6,
+      "arc_powercell": 3,
+      "arc_alloy": 2,
+      "arc_circuitry": 1
+    }
+  },
+  {
+    "id": "recipe_module",
+    "name": "Добыча 1",
+    "output": {
+      "item_id": "looting_mk1",
+      "qty": 1
+    },
+    "ingredients": {
+      "arc_circuitry": 1,
+      "arc_alloy": 1,
+      "wires": 2
+    }
+  },
+  {
+    "id": "recipe_looting_mk2",
+    "name": "Добыча 2",
+    "output": {
+      "item_id": "looting_mk2",
+      "qty": 1
+    },
+    "ingredients": {
+      "arc_circuitry": 2,
+      "arc_alloy": 2,
+      "wires": 3,
+      "battery": 1
+    }
+  },
+  {
+    "id": "recipe_looting_mk3_safekeeper",
+    "name": "Добыча 3 (Хранитель)",
+    "output": {
+      "item_id": "looting_mk3_safekeeper",
+      "qty": 1
+    },
+    "ingredients": {
+      "arc_circuitry": 3,
+      "arc_alloy": 3,
+      "wires": 4,
+      "battery": 2,
+      "arc_powercell": 1
+    }
+  },
+  {
+    "id": "recipe_combat_mk1",
+    "name": "Бой 1",
+    "output": {
+      "item_id": "combat_mk1",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 4,
+      "arc_circuitry": 1,
+      "battery": 1,
+      "wires": 2
+    }
+  },
+  {
+    "id": "recipe_combat_mk2",
+    "name": "Бой 2",
+    "output": {
+      "item_id": "combat_mk2",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 6,
+      "arc_circuitry": 2,
+      "arc_alloy": 1,
+      "battery": 1
+    }
+  },
+  {
+    "id": "recipe_tactical_mk1",
+    "name": "Стратегия 1",
+    "output": {
+      "item_id": "tactical_mk1",
+      "qty": 1
+    },
+    "ingredients": {
+      "arc_circuitry": 1,
+      "arc_alloy": 1,
+      "wires": 2,
+      "chemicals": 1
+    }
+  },
+  {
+    "id": "recipe_tactical_mk2",
+    "name": "Стратегия 2",
+    "output": {
+      "item_id": "tactical_mk2",
+      "qty": 1
+    },
+    "ingredients": {
+      "arc_circuitry": 2,
+      "arc_alloy": 2,
+      "wires": 3,
+      "battery": 2
+    }
+  },
+  {
+    "id": "recipe_pulse_rifle",
+    "name": "Буря I",
+    "output": {
+      "item_id": "tempest_i",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 6,
+      "wires": 3,
+      "arc_circuitry": 1,
+      "battery": 1
+    }
+  },
+  {
+    "id": "recipe_weapon_burletta_i",
+    "name": "Бурлетта I",
+    "output": {
+      "item_id": "burletta_i",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 4,
+      "wires": 1,
+      "plastic_parts": 1
+    }
+  },
+  {
+    "id": "recipe_weapon_arpeggio_i",
+    "name": "Арпеджио I",
+    "output": {
+      "item_id": "arpeggio_i",
+      "qty": 1
+    },
+    "ingredients": {
+      "metal_parts": 5,
+      "wires": 2,
+      "plastic_parts": 2,
+      "battery": 1
+    }
+  }
+]
