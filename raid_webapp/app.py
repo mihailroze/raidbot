@@ -446,8 +446,8 @@ def _validate_init_data(init_data: str) -> Optional[Dict[str, str]]:
         return None
     data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
     secret = hmac.new(
-        BOT_TOKEN.encode("utf-8"),
         b"WebAppData",
+        BOT_TOKEN.encode("utf-8"),
         hashlib.sha256,
     ).digest()
     calculated_hash = hmac.new(
@@ -548,8 +548,8 @@ def _validate_init_data_debug(init_data: str) -> tuple[Optional[Dict[str, str]],
         return None, "hash missing." + _build_init_debug(init_data, pairs, None, None, None, None, None, auth_date, False)
 
     secret_webapp = hmac.new(
-        BOT_TOKEN.encode("utf-8"),
         b"WebAppData",
+        BOT_TOKEN.encode("utf-8"),
         hashlib.sha256,
     ).digest()
     secret_login = hashlib.sha256(BOT_TOKEN.encode("utf-8")).digest()
