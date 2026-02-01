@@ -67,6 +67,7 @@ WEBAPP_AUTH_SECRET = os.getenv("WEBAPP_AUTH_SECRET", "").strip() or BOT_TOKEN
 WEBAPP_TOKEN_TTL = int(os.getenv("WEBAPP_TOKEN_TTL", "2592000"))
 WEBAPP_DISABLE_COOLDOWNS = os.getenv("WEBAPP_DISABLE_COOLDOWNS", "1").strip() == "1"
 WEBAPP_ADMIN_EMAILS = os.getenv("WEBAPP_ADMIN_EMAILS", "").strip()
+WEBAPP_TG_DEBUG = os.getenv("WEBAPP_TG_DEBUG", "").strip() == "1"
 
 
 def _parse_int(value: str, default: int) -> int:
@@ -457,18 +458,50 @@ def _validate_init_data(init_data: str) -> Optional[Dict[str, str]]:
     return pairs
 
 
+def _debug_init_suffix(
+    init_data: Optional[str],
+    pairs: Optional[Dict[str, str]],
+    received_hash: Optional[str],
+    calculated_hash: Optional[str],
+    auth_date: Optional[str],
+) -> str:
+    if not WEBAPP_TG_DEBUG:
+        return ""
+    parts: list[str] = []
+    if init_data is not None:
+        parts.append(f"len={len(init_data)}")
+    if pairs is not None:
+        keys = ",".join(sorted(pairs.keys()))
+        parts.append(f"keys={keys}")
+    if received_hash is not None:
+        parts.append(f"hash_len={len(received_hash)}")
+    if calculated_hash and received_hash:
+        parts.append(f"calc={calculated_hash[:8]} recv={received_hash[:8]}")
+    if auth_date:
+        try:
+            auth_ts = int(auth_date)
+            age = int(abs(time.time() - auth_ts))
+            parts.append(f"auth_date={auth_date} age={age}s")
+        except Exception:
+            parts.append(f"auth_date={auth_date}")
+    if not parts:
+        return ""
+    return " | debug: " + "; ".join(parts)
+
+
 def _validate_init_data_debug(init_data: str) -> tuple[Optional[Dict[str, str]], str]:
     if not BOT_TOKEN:
-        return None, "BOT_TOKEN ?? ?????."
+        return None, "BOT_TOKEN not set." + _debug_init_suffix(init_data, None, None, None, None)
     if not init_data:
-        return None, "init_data ????."
+        return None, "init_data empty." + _debug_init_suffix(init_data, None, None, None, None)
     try:
         pairs = dict(parse_qsl(init_data, strict_parsing=True))
     except ValueError:
-        return None, "?? ??????? ????????? init_data."
+        return None, "init_data parse error." + _debug_init_suffix(init_data, None, None, None, None)
     received_hash = pairs.pop("hash", None)
+    auth_date = pairs.get("auth_date")
     if not received_hash:
-        return None, "hash ???????????."
+        return None, "hash missing." + _debug_init_suffix(init_data, pairs, None, None, auth_date)
     data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
     secret = hmac.new(
         BOT_TOKEN.encode("utf-8"),
@@ -479,7 +512,9 @@ def _validate_init_data_debug(init_data: str) -> tuple[Optional[Dict[str, str]],
         secret, data_check_string.encode("utf-8"), hashlib.sha256
     ).hexdigest()
     if calculated_hash != received_hash:
-        return None, "hash ?? ?????????."
+        return None, "hash mismatch." + _debug_init_suffix(
+            init_data, pairs, received_hash, calculated_hash, auth_date
+        )
     return pairs, "ok"
 
 
