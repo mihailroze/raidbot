@@ -444,7 +444,11 @@ def _validate_init_data(init_data: str) -> Optional[Dict[str, str]]:
     if not received_hash:
         return None
     data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
-    secret = hashlib.sha256(BOT_TOKEN.encode("utf-8")).digest()
+    secret = hmac.new(
+        BOT_TOKEN.encode("utf-8"),
+        b"WebAppData",
+        hashlib.sha256,
+    ).digest()
     calculated_hash = hmac.new(
         secret, data_check_string.encode("utf-8"), hashlib.sha256
     ).hexdigest()
