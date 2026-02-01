@@ -2202,6 +2202,31 @@ async def auth_telegram(payload: AuthTelegramRequest) -> Dict[str, Any]:
     }
 
 
+@app.post("/api/auth/telegram/init")
+async def auth_telegram_init(payload: InitDataRequest) -> Dict[str, Any]:
+    if not BOT_TOKEN:
+        return {"ok": False, "message": "BOT_TOKEN ?? ?????."}
+    pairs = _validate_init_data(payload.init_data)
+    if not pairs:
+        return {"ok": False, "message": "???????????? ?????? Telegram initData."}
+    tg_user = _parse_user(pairs)
+    if not tg_user:
+        return {"ok": False, "message": "???????????? Telegram ?? ??????."}
+    player_id = await db.upsert_player(tg_user)
+    token = _create_token(player_id)
+    display_name = (
+        tg_user.username
+        or " ".join(p for p in (tg_user.first_name, tg_user.last_name) if p)
+        or "?????"
+    )
+    return {
+        "ok": True,
+        "message": "???? ????? Telegram ????????.",
+        "token": token,
+        "user": {"nickname": display_name},
+    }
+
+
 @app.post("/api/state")
 async def state(payload: InitDataRequest) -> Dict[str, Any]:
     user, player_id = await _authorize(payload)

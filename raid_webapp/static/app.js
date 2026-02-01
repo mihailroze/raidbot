@@ -121,6 +121,7 @@ let currentState = null;
 let activeTab = "raid";
 let authToken = null;
 let tgAuthTimer = null;
+let tgInitAttempted = false;
 function hasAuth() {
   return !!authToken;
 }
@@ -195,6 +196,31 @@ if (authToken) {
   setAuthToken(authToken);
 } else {
   toggleAuthButtons(false);
+}
+if (!authToken) {
+  tryTelegramInitAuth();
+}
+
+async function tryTelegramInitAuth() {
+  if (tgInitAttempted || authToken) return;
+  tgInitAttempted = true;
+  if (!tg || !tg.initData) return;
+  if (tgLoginWrap) tgLoginWrap.classList.add("hidden");
+  if (loginStatus) loginStatus.textContent = "Вход через Telegram...";
+  try {
+    const res = await apiPost("/api/auth/telegram/init", {
+      init_data: tg.initData,
+    });
+    if (res.ok && res.token) {
+      setAuthToken(res.token, res.user);
+      await refreshCore();
+    } else if (loginStatus) {
+      loginStatus.textContent =
+        res.message || "Ошибка авторизации через Telegram.";
+    }
+  } catch (err) {
+    if (loginStatus) loginStatus.textContent = "Ошибка авторизации через Telegram.";
+  }
 }
 
 function renderStats(rating) {
