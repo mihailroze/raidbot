@@ -489,34 +489,83 @@ def _debug_init_suffix(
     return " | debug: " + "; ".join(parts)
 
 
+def _build_init_debug(
+    init_data: Optional[str],
+    pairs: Optional[Dict[str, str]],
+    received_hash: Optional[str],
+    calc_no_sig: Optional[str],
+    calc_with_sig: Optional[str],
+    auth_date: Optional[str],
+    has_sig: bool,
+) -> str:
+    if not WEBAPP_TG_DEBUG:
+        return ""
+    parts: list[str] = []
+    if init_data is not None:
+        parts.append(f"len={len(init_data)}")
+    if pairs is not None:
+        keys = ",".join(sorted(pairs.keys()))
+        parts.append(f"keys={keys}")
+    if received_hash is not None:
+        parts.append(f"hash_len={len(received_hash)}")
+    parts.append(f"sig={1 if has_sig else 0}")
+    if calc_no_sig and received_hash:
+        parts.append(f"calc_no_sig={calc_no_sig[:8]}")
+    if calc_with_sig and received_hash:
+        parts.append(f"calc_sig={calc_with_sig[:8]}")
+    if received_hash:
+        parts.append(f"recv={received_hash[:8]}")
+    if auth_date:
+        try:
+            auth_ts = int(auth_date)
+            age = int(abs(time.time() - auth_ts))
+            parts.append(f"auth_date={auth_date} age={age}s")
+        except Exception:
+            parts.append(f"auth_date={auth_date}")
+    if not parts:
+        return ""
+    return " | debug: " + "; ".join(parts)
+
+
 def _validate_init_data_debug(init_data: str) -> tuple[Optional[Dict[str, str]], str]:
     if not BOT_TOKEN:
-        return None, "BOT_TOKEN not set." + _debug_init_suffix(init_data, None, None, None, None)
+        return None, "BOT_TOKEN not set." + _build_init_debug(init_data, None, None, None, None, None, False)
     if not init_data:
-        return None, "init_data empty." + _debug_init_suffix(init_data, None, None, None, None)
+        return None, "init_data empty." + _build_init_debug(init_data, None, None, None, None, None, False)
     try:
         pairs = dict(parse_qsl(init_data, strict_parsing=True))
     except ValueError:
-        return None, "init_data parse error." + _debug_init_suffix(init_data, None, None, None, None)
+        return None, "init_data parse error." + _build_init_debug(init_data, None, None, None, None, None, False)
     received_hash = pairs.pop("hash", None)
     auth_date = pairs.get("auth_date")
     if not received_hash:
-        return None, "hash missing." + _debug_init_suffix(init_data, pairs, None, None, auth_date)
-    data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
+        return None, "hash missing." + _build_init_debug(init_data, pairs, None, None, None, auth_date, False)
+
     secret = hmac.new(
         BOT_TOKEN.encode("utf-8"),
         b"WebAppData",
         hashlib.sha256,
     ).digest()
-    calculated_hash = hmac.new(
+
+    pairs_no_sig = dict(pairs)
+    had_sig = pairs_no_sig.pop("signature", None) is not None
+    data_check_string = "\n".join(f"{k}={pairs_no_sig[k]}" for k in sorted(pairs_no_sig))
+    calc_no_sig = hmac.new(
         secret, data_check_string.encode("utf-8"), hashlib.sha256
     ).hexdigest()
-    if calculated_hash != received_hash:
-        return None, "hash mismatch." + _debug_init_suffix(
-            init_data, pairs, received_hash, calculated_hash, auth_date
-        )
-    return pairs, "ok"
+    if calc_no_sig == received_hash:
+        return pairs, "ok(no_sig)"
 
+    data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
+    calc_with_sig = hmac.new(
+        secret, data_check_string.encode("utf-8"), hashlib.sha256
+    ).hexdigest()
+    if calc_with_sig == received_hash:
+        return pairs, "ok(sig)"
+
+    return None, "hash mismatch." + _build_init_debug(
+        init_data, pairs, received_hash, calc_no_sig, calc_with_sig, auth_date, had_sig
+    )
 
 def _parse_user(pairs: Dict[str, str]) -> Optional[TgUser]:
     raw_user = pairs.get("user")
