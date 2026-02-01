@@ -457,6 +457,32 @@ def _validate_init_data(init_data: str) -> Optional[Dict[str, str]]:
     return pairs
 
 
+def _validate_init_data_debug(init_data: str) -> tuple[Optional[Dict[str, str]], str]:
+    if not BOT_TOKEN:
+        return None, "BOT_TOKEN ?? ?????."
+    if not init_data:
+        return None, "init_data ????."
+    try:
+        pairs = dict(parse_qsl(init_data, strict_parsing=True))
+    except ValueError:
+        return None, "?? ??????? ????????? init_data."
+    received_hash = pairs.pop("hash", None)
+    if not received_hash:
+        return None, "hash ???????????."
+    data_check_string = "\n".join(f"{k}={pairs[k]}" for k in sorted(pairs))
+    secret = hmac.new(
+        BOT_TOKEN.encode("utf-8"),
+        b"WebAppData",
+        hashlib.sha256,
+    ).digest()
+    calculated_hash = hmac.new(
+        secret, data_check_string.encode("utf-8"), hashlib.sha256
+    ).hexdigest()
+    if calculated_hash != received_hash:
+        return None, "hash ?? ?????????."
+    return pairs, "ok"
+
+
 def _parse_user(pairs: Dict[str, str]) -> Optional[TgUser]:
     raw_user = pairs.get("user")
     if not raw_user:
@@ -841,7 +867,7 @@ async def _authorize(payload: InitDataRequest) -> tuple[TgUser, int]:
                 )
                 player_id = pid
     if payload.init_data:
-        pairs = _validate_init_data(payload.init_data)
+        pairs, reason = _validate_init_data_debug(payload.init_data)
         if pairs:
             user = _parse_user(pairs)
     if not user and payload.login_data:
@@ -2212,7 +2238,7 @@ async def auth_telegram_init(payload: InitDataRequest) -> Dict[str, Any]:
         return {"ok": False, "message": "BOT_TOKEN ?? ?????."}
     pairs = _validate_init_data(payload.init_data)
     if not pairs:
-        return {"ok": False, "message": "???????????? ?????? Telegram initData."}
+        return {"ok": False, "message": f"???????????? ?????? Telegram initData: {reason}"}
     tg_user = _parse_user(pairs)
     if not tg_user:
         return {"ok": False, "message": "???????????? Telegram ?? ??????."}
