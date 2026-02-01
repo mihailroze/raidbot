@@ -122,8 +122,41 @@ let activeTab = "raid";
 let authToken = null;
 let tgAuthTimer = null;
 let tgInitAttempted = false;
+let logTypingFrame = null;
+let lastLogText = null;
 function hasAuth() {
   return !!authToken;
+}
+
+function setLogText(text, animate = true) {
+  if (!logBlock) return;
+  const full = text || "";
+  if (lastLogText === full) return;
+  lastLogText = full;
+  if (logTypingFrame) {
+    cancelAnimationFrame(logTypingFrame);
+    logTypingFrame = null;
+  }
+  if (!animate || !full) {
+    logBlock.textContent = full;
+    logBlock.classList.remove("typing");
+    return;
+  }
+  logBlock.classList.add("typing");
+  const start = performance.now();
+  const duration = Math.min(1800, Math.max(300, full.length * 20));
+  const step = (now) => {
+    const progress = Math.min(1, (now - start) / duration);
+    const count = Math.max(1, Math.ceil(full.length * progress));
+    logBlock.textContent = full.slice(0, count);
+    if (progress < 1) {
+      logTypingFrame = requestAnimationFrame(step);
+    } else {
+      logTypingFrame = null;
+      logBlock.classList.remove("typing");
+    }
+  };
+  logTypingFrame = requestAnimationFrame(step);
 }
 
 function toggleAppButtons(disabled) {
@@ -586,7 +619,7 @@ function renderActions(state) {
     const pending = session.pending_choice;
     const choices = pending.choices || [];
     if (pending.text) {
-      logBlock.textContent = pending.text;
+      setLogText(pending.text, true);
     }
     if (choices.length) {
       choices.forEach((choice) => {
@@ -600,7 +633,7 @@ function renderActions(state) {
     const label = `${pendingItem.emoji ? pendingItem.emoji + " " : ""}${
       pendingItem.name
     }`;
-    logBlock.textContent = `Найден предмет: ${label}`;
+    setLogText(`Найден предмет: ${label}`, true);
     addButton("Взять", "take", false);
     addButton("Не брать", "skip", false);
     return;
@@ -669,7 +702,7 @@ function updateCore(data, message) {
   renderOnboarding(data);
   renderAdminFlag(data);
   if (message) {
-    logBlock.textContent = message;
+    setLogText(message, true);
   }
   renderActions(data);
 }
