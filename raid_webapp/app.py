@@ -1717,11 +1717,22 @@ async def build_state(player_id: int, chat_id: Optional[int]) -> Dict[str, Any]:
             "items_total": int(totals.get("items_total", 0)),
         }
 
-    pending_item = build_pending_item(session) if session else None
+    session_payload = dict(session) if session else None
+    pending_item = build_pending_item(session_payload) if session_payload else None
     cooldowns = {}
-    if session:
+    if session_payload:
         now = time.time()
-        cooldowns = {a: cooldown_remaining(session, a, now) for a in ACTION_COOLDOWNS}
+        cooldowns = {
+            a: cooldown_remaining(session_payload, a, now) for a in ACTION_COOLDOWNS
+        }
+        event_risk = calc_event_chance(int(session_payload.get("greed", 0)), settings)
+        evac_bonus = effective_evac_bonus(session_payload)
+        evac_chance = calc_evac_chance(
+            int(session_payload.get("greed", 0)), evac_bonus, settings
+        )
+        session_payload["event_risk"] = event_risk
+        session_payload["evac_chance"] = evac_chance
+        session_payload["evac_bonus_eff"] = evac_bonus
 
     return {
         "rating": {
@@ -1748,7 +1759,7 @@ async def build_state(player_id: int, chat_id: Optional[int]) -> Dict[str, Any]:
                 for item_id, qty in sorted(inventory.items())
             ],
         },
-        "session": session,
+        "session": session_payload,
         "pending_item": pending_item,
         "cooldowns": cooldowns,
         "can_medkit": has_consumable(session, data) if session else False,

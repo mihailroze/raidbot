@@ -317,6 +317,18 @@ function renderSession(session) {
     ? Object.values(session.inventory).reduce((a, b) => a + b, 0)
     : 0;
   const statusLabel = session.status === "combat" ? "Бой" : "В рейде";
+  const riskPct =
+    session.event_risk !== undefined && session.event_risk !== null
+      ? Math.round(session.event_risk * 100)
+      : null;
+  const evacPct =
+    session.evac_chance !== undefined && session.evac_chance !== null
+      ? Math.round(session.evac_chance * 100)
+      : null;
+  const riskLine =
+    riskPct !== null ? `<div>Риск события <span>${riskPct}%</span></div>` : "";
+  const evacLine =
+    evacPct !== null ? `<div>Шанс эвакуации <span>${evacPct}%</span></div>` : "";
   const enemyLine =
     session.status === "combat" && session.enemy
       ? `<div>Враг <span>${session.enemy.name} (${session.enemy.hp_current}/${session.enemy.hp})</span></div>`
@@ -326,6 +338,8 @@ function renderSession(session) {
       <div>Статус <span>${statusLabel}</span></div>
       <div>HP <span>${session.hp}/${session.max_hp}</span></div>
       <div>Алчность <span>${session.greed}</span></div>
+      ${riskLine}
+      ${evacLine}
       <div>Лут <span>${session.loot_value}</span></div>
       <div>Киллы <span>${session.kills}</span></div>
       <div>Слоты рейда <span>${raidItems}/20</span></div>
